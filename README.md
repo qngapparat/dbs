@@ -150,22 +150,47 @@ The SSN is an Integer, so we added the Suffix `-A` to every first Name.
 
 ### Materialized view with triggers
 
+**CREATE TABLE:**
+
 >create table patient_view as (
 select PatientID, firstname, lastname, svn, admissionDate
 from Patient
 )
 
+**INSERT TRIGGER:** 
 
-
-DROP TRIGGER IF EXISTS upd
+>DROP TRIGGER IF EXISTS upd
 DELIMITER //
-
 CREATE TRIGGER upd
-AFTER UPDATE ON Patient
+AFTER INSERT ON Patient
 FOR EACH ROW
 BEGIN
-
-	SET NEW.
-        
-END//
+select PatientID, firstname, lastname, svn, admissionDate
+from Patient
+where Patient.PatientID = NEW.PatientID
+into @id, @first, @last, @svn, @admdate;
+replace into patient_view
+values (@id, @first, @last, @svn, @admdate);
+END;
+//
 DELIMITER ;
+
+**DELETE TRIGGER:**
+
+>DROP TRIGGER IF EXISTS upd
+DELIMITER //
+CREATE TRIGGER upd
+AFTER DELETE ON Patient
+FOR EACH ROW
+BEGIN
+Delete from patient_view
+where
+patient_view.PatientID = OLD.PatientID;
+END;
+//
+DELIMITER ;
+
+Another option would be ON CASCADE DELETE.
+
+
+
