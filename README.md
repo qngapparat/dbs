@@ -1,7 +1,7 @@
 ### Projekt Teil 2
 
 Aufgaben 1, 3, 4, 5: siehe `proj2.md`
-Aufgabe 2: siehe `jdbcdemo.tar.gz` (IntelliJ project)
+<br><br>Aufgabe 2: siehe `jdbcdemo.tar.gz` (IntelliJ project)
 
 
 ### Queries
@@ -119,10 +119,53 @@ Perhaps measures such as tweaking the persistence of the cache (which is deleted
 
 ### Materialized view
 
-create table patient_view as (
+>create table patient_view as (
 select PatientID, firstname, lastname, svn, admissionDate
 from Patient
 )
 
 **CREATE TABLE:** Query took 0.1797 seconds.
 
+>select * from patient_view
+
+**SELECT:** (1000 Elements): Query took 0.0002 seconds.
+
+**INSERT** 9000 Elements, via CSV: > 5 minutes (on a 250 MB RAM Server). Import script timed out at the following point:
+`6641 Elements inserted`, in estimated `5 minutes`.
+
+>select * from patient_view
+
+**SELECT:** (6641 Elements): Query took 0.0002 seconds.
+
+The SSN is an Integer, so we added the Suffix `-A` to every first Name.
+
+>update patient_view set firstname = CONCAT(svn, "-A")
+
+**UPDATE:** 6641 rows affected: Query took 0.1424 seconds.
+
+>delete from patient_view
+
+**DELETE:** 6641 rows deleted: Query took 0.0772 seconds.
+
+
+### Materialized view with triggers
+
+>create table patient_view as (
+select PatientID, firstname, lastname, svn, admissionDate
+from Patient
+)
+
+
+
+DROP TRIGGER IF EXISTS upd
+DELIMITER //
+
+CREATE TRIGGER upd
+AFTER UPDATE ON Patient
+FOR EACH ROW
+BEGIN
+
+	SET NEW.
+        
+END//
+DELIMITER ;
