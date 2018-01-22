@@ -96,14 +96,14 @@ The implementation can be found, zipped, as Maven project in `/` of this folder.
 
 ### Performance
 
-**Query 1**:  39 total, Query took 0.0008 seconds.
-**Query 2**:  81 total, Query took 0.0008 seconds.
-**Query 3**:  2 total, Query took 0.0004 seconds.
-**Query 4**:  14 total, Query took 0.0001 seconds.
-**Query 5**:  94 total, Query took 0.0008 seconds.
-**Query 6**:  204 total, Query took 0.001 seconds.
-**Query 7**:  193 total, Query took 0.0008 seconds.
-**Query 8**:  193 total, Query took 0.0008 seconds.
+**Query 1**:  39 total, Query took 0.0008 seconds.<br>
+**Query 2**:  81 total, Query took 0.0008 seconds.<br>
+**Query 3**:  2 total, Query took 0.0004 seconds.<br>
+**Query 4**:  14 total, Query took 0.0001 seconds.<br>
+**Query 5**:  94 total, Query took 0.0008 seconds.<br>
+**Query 6**:  204 total, Query took 0.001 seconds.<br>
+**Query 7**:  193 total, Query took 0.0008 seconds.<br>
+**Query 8**:  193 total, Query took 0.0008 seconds.<br>
 
 #### Thoughts
 
@@ -124,28 +124,28 @@ select PatientID, firstname, lastname, svn, admissionDate
 from Patient
 )
 
-**CREATE TABLE:** Query took 0.1797 seconds.
+CREATE TABLE: Query took 0.1797 seconds.
 
 >select * from patient_view
 
-**SELECT:** (1000 Elements): Query took 0.0002 seconds.
+SELECT: (1000 Elements): Query took 0.0002 seconds.
 
-**INSERT** 9000 Elements, via CSV: > 5 minutes (on a 250 MB RAM Server). Import script timed out at the following point:
+INSERT 9000 Elements, via CSV: > 5 minutes (on a 250 MB RAM Server). Import script timed out at the following point:
 `6641 Elements inserted`, in estimated `5 minutes`.
 
 >select * from patient_view
 
-**SELECT:** (6641 Elements): Query took 0.0002 seconds.
+SELECT: (6641 Elements): Query took 0.0002 seconds.
 
 The SSN is an Integer, so we added the Suffix `-A` to every first Name.
 
 >update patient_view set firstname = CONCAT(svn, "-A")
 
-**UPDATE:** 6641 rows affected: Query took 0.1424 seconds.
+UPDATE: 6641 rows affected: Query took 0.1424 seconds.
 
 >delete from patient_view
 
-**DELETE:** 6641 rows deleted: Query took 0.0772 seconds.
+DELETE: 6641 rows deleted: Query took 0.0772 seconds.
 
 
 ### Materialized view with triggers
@@ -192,5 +192,6 @@ DELIMITER ;
 
 Another option would be ON CASCADE DELETE.
 
+INSERTs seemed to perform better than building the materialized view on-demand, but we were kept from testing the DELETE trigger due to foreign key constraint violations caused by crappy ER-Modelling. The former is hardly surprising, considering it is compared to building a table on-demand, while with these triggers, we are finding, and updating affected entries only.
 
 
