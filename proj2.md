@@ -1,4 +1,6 @@
-1.
+### Queries
+
+**1**
 
 >Select e.firstname, e.lastname
 from Employee as e
@@ -8,7 +10,7 @@ select p.firstname, p.lastname
 from Patient as p
 where p.lastname LIKE 'A%'
 
-1.
+**2**
 
 >select plz.PLZ, plz.ORT, count(p.PatientID)
 from Patient p join PLZORT plz
@@ -22,7 +24,7 @@ where
 e.PLZORT_PLZ = plz.PLZ
 group by plz.PLZ
 
-1.
+**3**
 
 >select * 
 from Questionnare q join filled f
@@ -31,7 +33,7 @@ group by q.QuestionnareTitle
 having count(f.QuestionnareTitle > 100)
 
 
-1. 
+**4**
 
 >select *
 from Patient p
@@ -39,9 +41,7 @@ where
 admissionDate < '2019-02-02' AND
 admissionDate > '2017-02-02'
 
-1.
-
-???
+**5**
 
 
 >select s.StudyTitle, avg(cte.nummer)
@@ -58,7 +58,7 @@ s.StudyTitle = sc.Study_StudyTitle AND
 group by s.StudyTitle
 
 
-1.
+**6**
 
 
 >select *
@@ -76,10 +76,40 @@ e.EmployeeID = w.Employee_EmployeeID AND
 w.Department_idDepartment = cte.idDepartment AND
 e.salary > 100
 
-1.
+**7**
 
 >Select e.Title, count(d.Employee_EmployeeID) 
 from Expertise e join Doctor d
 where 
 e.Employee_EmployeeID = d.Employee_EmployeeID
 group by e.Title
+
+### JDBC
+
+The implementation can be found, zipped, as Maven project in `/` of this folder.
+
+### Performance
+
+**Query 1**:  39 total, Query took 0.0008 seconds.
+**Query 2**:  81 total, Query took 0.0008 seconds.
+**Query 3**:  2 total, Query took 0.0004 seconds.
+**Query 4**:  14 total, Query took 0.0001 seconds.
+**Query 5**:  94 total, Query took 0.0008 seconds.
+**Query 6**:  204 total, Query took 0.001 seconds.
+**Query 7**:  193 total, Query took 0.0008 seconds.
+**Query 8**:  193 total, Query took 0.0008 seconds.
+
+#### Thoughts
+
+Obviously querying is a breeze with our small-ish datasets. Noteworthy might be that we ran all queries thru phpMyAdmin on a MySQL server with 250MB of RAM. Moreover, even if these results were sufficient to predict performance on a larger scale, some result might be skewed, as we relied on semi-realistic data. For example, we used words of length 2-6 for most strings, randomly generated ones, that is.
+
+Supposedly there is a performance boost when replacing certain joins with selects. Although it worked after some tinkering, we didn't notice any difference (well).
+
+Primary keys are often Strings, which is anything but optimal. Relying on integers would be both more convenient, and yield better performance (again, noticeable with larger datasets).
+
+We used the InnoDB Engine (default), which is ACID-compliant. Some suggest using myISAM would yield performance benefits in some cases, but these are (supposedly) few and far between; at the cost of reduced integrity. Moreover, InnoDB uses clustered indexes, which makes picking the primary key a delicate matter.
+
+Perhaps measures such as tweaking the persistence of the cache (which is deleted on restarts, and has to be rebuilt) could increase performance after such events.
+
+### Materialized view
+
